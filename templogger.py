@@ -5,21 +5,37 @@ import datetime
 import serial
 import logging
 import sys
-import pylab
 import os
-
-# For plotting
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-
+import argparse
 
 from time import time, strftime
 
+# Command line arguments
+parser = argparse.ArgumentParser(description='Temperature logger.')
+parser.add_argument('--noplot', action='store_true', help='Do not generate plot in the end.')
+parser.add_argument('--noplotshow', action='store_true', help='Do not show plot in the end but still save.')
+parser.add_argument('--logfile', help='Filename to log to')
+args = parser.parse_args()
+#print(args)
+#print(args.logfile)
+#sys.exit(0)
+
+if not args.noplot:
+    # For plotting
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+
 # Set up logging
+if args.logfile:
+    logfilename = args.logfile
+else:
+    logdate = strftime("%Y%m%d_%H%M%S")
+    logfilename = "templog_%s.csv" %(logdate)
+
 logger = logging.getLogger('serialmulti')
-logdate = strftime("%Y%m%d_%H%M%S")
-logfilename = "templog_%s.csv" %(logdate)
 hdlr = logging.FileHandler(logfilename)
 formatter = logging.Formatter('%(message)s')
 hdlr.setFormatter(formatter)
@@ -72,9 +88,11 @@ while True:
     except (ValueError):
         continue
 
+## Might not want to plot
+if args.noplot:
+    sys.exit(0)
 
 ## Do the plotting
-
 timestamp, temperature, pressure = np.loadtxt(logfilename,
                                               unpack=True,
                                               delimiter=",",
@@ -93,7 +111,8 @@ plt.xlabel("Time")
 plt.ylim([min(temperature)-0.2, max(temperature)+0.2])
 fig.autofmt_xdate(rotation=45)
 plt.grid(True)
-imagefilename = "plot_%s.png" %(logdate)
+imagefilename = "%s.png" %(logfilename)
 plt.savefig(imagefilename)
 print("\n\n...Image saved to %s" %(imagefilename))
-plt.show()
+if not args.noplotshow:
+    plt.show()
