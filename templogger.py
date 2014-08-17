@@ -18,9 +18,6 @@ parser.add_argument('--noplotshow', action='store_true', help='Do not show plot 
 parser.add_argument('--logfile', help='Filename to log to')
 parser.add_argument('--onlyplot', metavar='FILENAME', help="Do not start to log, only plot from FILENAME")
 args = parser.parse_args()
-#print(args)
-#print(args.logfile)
-#sys.exit(0)
 
 if not args.noplot:
     # For plotting
