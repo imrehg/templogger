@@ -1,6 +1,14 @@
 #!/usr/bin/env python2
 """
 Temperature logger and plotter
+
+Using an Arduino and a BMP085 temperature/atmospheric pressure module
+log the temperature and display results.
+
+The Arduino is already flashed with program to return reading every 1 second,
+in the form of `temperature,pressure\n`, example `29.2,100650`.
+
+For help, can run the program with the `-h` command line parameter.
 """
 import datetime
 import serial
@@ -11,7 +19,7 @@ import argparse
 
 from time import time, strftime
 
-# Command line arguments
+## Handling command line arguments
 parser = argparse.ArgumentParser(description='Temperature logger.')
 parser.add_argument('--noplot', action='store_true', help='Do not generate plot in the end.')
 parser.add_argument('--noplotshow', action='store_true', help='Do not show plot in the end but still save.')
@@ -19,8 +27,9 @@ parser.add_argument('--logfile', help='Filename to log to')
 parser.add_argument('--onlyplot', metavar='FILENAME', help="Do not start to log, only plot from FILENAME")
 args = parser.parse_args()
 
+## Conditional import, as not needed if nothing to plot
 if not args.noplot:
-    # For plotting
+    ## For plotting
     import numpy as np
     import matplotlib
     ## if not showing then put plotting engine in the background
@@ -30,7 +39,7 @@ if not args.noplot:
     import matplotlib.dates as mdates
 
 if not args.onlyplot:
-    # Set up logging
+    ## Set up logging
     if args.logfile:
         logfilename = args.logfile
     else:
@@ -44,13 +53,14 @@ if not args.onlyplot:
     logger.addHandler(hdlr)
     logger.setLevel(logging.INFO)
 
-    # Find the right serial port
+    ## Find the right serial port, default settings for Linux
     serialbase = "/dev/ttyUSB"
     countbase = 0
-    if (os.name) == "nt":
+    if (os.name) == "nt":   # modify default settings for Windows
         serialbase = "COM"
         countbase = 1
 
+    ## Probe serial connections until one can connect
     foundserial = False
     serialport = ''
     for i in range(countbase, 20):
@@ -71,7 +81,7 @@ if not args.onlyplot:
     print("Now logging to %s" %(logfilename))
     print("Press Ctrl-C to stop!")
 
-    # Setting up output file
+    ## Setting up output file
     logger.info("#Time(Localtime),Temperature(degC),Pressure(Pa)")
 
     while True:
@@ -87,13 +97,17 @@ if not args.onlyplot:
             sys.stdout.flush()
         except (KeyboardInterrupt):
             break
-        except (ValueError):
+        except (ValueError):  # if conversion does not succeed in try section
             continue
+
+#### Logging finished
+#### Plotting section
 
 ## Might not want to plot
 if args.noplot:
     sys.exit(0)
 
+## Where does the data file come from - command line or previous logging
 if args.onlyplot:
     datafile = args.onlyplot
 else:
@@ -120,6 +134,7 @@ plt.xlabel("Time")
 plt.ylim([min(temperature)-0.2, max(temperature)+0.2])
 fig.autofmt_xdate(rotation=45)
 plt.grid(True)
+
 if not args.onlyplot:
     imagefilename = "%s.png" %(datafile)
     plt.savefig(imagefilename)
