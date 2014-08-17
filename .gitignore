@@ -1,5 +1,7 @@
 .*
 *~
+*.pyc
+*#
 *.spec
 *.csv
 *.png
