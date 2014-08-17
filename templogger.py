@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 """
 Temperature logger and plotter
 """
