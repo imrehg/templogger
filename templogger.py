@@ -124,7 +124,6 @@ timestamp, temperature = np.loadtxt(datafile,
 fig = plt.figure(figsize=(8, 6), dpi=80, facecolor='w', edgecolor='k')
 ax = fig.add_subplot(111)
 
-# ax.set_xticks(timestamp) # Tickmark + label at every plotted point
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 
 plt.plot_date(x=timestamp, y=temperature, fmt="k-")
