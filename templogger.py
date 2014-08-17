@@ -100,10 +100,12 @@ else:
     datafile = logfilename
 
 ## Do the plotting
-timestamp, temperature, pressure = np.loadtxt(datafile,
-                                              unpack=True,
-                                              delimiter=",",
-                                              converters={ 0: mdates.strpdate2num("%Y-%m-%d %H:%M:%S.%f")})
+timestamp, temperature = np.loadtxt(datafile,
+                                    unpack=True,
+                                    delimiter=",",
+                                    converters={ 0: mdates.strpdate2num("%Y-%m-%d %H:%M:%S.%f")},
+                                    usecols=[0, 1],
+                                    )
 
 fig = plt.figure(figsize=(8, 6), dpi=80, facecolor='w', edgecolor='k')
 ax = fig.add_subplot(111)
