@@ -6,6 +6,7 @@ import serial
 import logging
 import sys
 import pylab
+import os
 
 # For plotting
 import numpy as np
@@ -25,8 +26,29 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
+# Find the right serial port
+serialbase = "/dev/ttyUSB"
+countbase = 0
+if (os.name) == "nt":
+    serialbase = "COM"
+    countbase = 1
 
-dev = serial.Serial('/dev/ttyUSB0', 115200, timeout=2)
+foundserial = False
+serialport = ''
+for i in range(countbase, 20):
+    try :
+        serialport = "%s%i" %(serialbase, i)
+        dev = serial.Serial(serialport, 115200, timeout=2)
+        foundserial = True
+        break
+    except(OSError):
+        continue
+
+if not foundserial:
+    print("Could not find attached logger on serial/USB port.")
+    sys.exit(1)
+else:
+    print "Found good serial port at %s" %serialport
 
 print("Now logging to %s" %(logfilename))
 print("Press Ctrl-C to stop!")
