@@ -38,6 +38,8 @@ if not args.noplot:
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
 
+print("Temperature Logger v0.1 - MoonPunch.org")
+
 if not args.onlyplot:
     ## Set up logging
     if args.logfile:
@@ -67,9 +69,10 @@ if not args.onlyplot:
         try :
             serialport = "%s%i" %(serialbase, i)
             dev = serial.Serial(serialport, 115200, timeout=2)
-            foundserial = True
-            break
-        except(OSError):
+            if len(dev.readline()) > 0:
+                foundserial = True
+                break
+        except(OSError, serial.SerialException):
             continue
 
     if not foundserial:
@@ -92,12 +95,12 @@ if not args.onlyplot:
             now = datetime.datetime.now()
             vals = input.strip().split(',')
             temperature, pressure = float(vals[0]), int(vals[1])
-            logger.info("%s,%s,%s" % (now,temperature,pressure))
+            logger.info("%s,%s,%s" % (now.strftime("%Y-%m-%d %H:%M:%S.%f"),temperature,pressure))
             sys.stdout.write("Temperature: %.1f C; Pressure: %.1fhPa   \r" % (temperature,pressure/1000.0) )
             sys.stdout.flush()
         except (KeyboardInterrupt):
             break
-        except (ValueError):  # if conversion does not succeed in try section
+        except (ValueError, IndexError):  # if conversion does not succeed in try section
             continue
 
 #### Logging finished
@@ -106,6 +109,8 @@ if not args.onlyplot:
 ## Might not want to plot
 if args.noplot:
     sys.exit(0)
+
+print("\n\nPlease wait, generating image from log...")
 
 ## Where does the data file come from - command line or previous logging
 if args.onlyplot:
@@ -137,7 +142,7 @@ plt.grid(True)
 if not args.onlyplot:
     imagefilename = "%s.png" %(datafile)
     plt.savefig(imagefilename)
-    print("\n\n...Image saved to %s" %(imagefilename))
+    print("=> Image saved to %s" %(imagefilename))
 
 if not args.noplotshow:
     plt.show()
