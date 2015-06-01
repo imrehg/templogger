@@ -32,6 +32,9 @@ if not args.noplot:
     ## For plotting
     import numpy as np
     import matplotlib
+    # Prevent conflict with Qt5 and above.
+    from matplotlib import use as mpl_use
+    mpl_use("Qt4Agg")
     ## if not showing then put plotting engine in the background
     if args.noplotshow:
         matplotlib.use('Agg')
