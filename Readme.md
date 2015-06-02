@@ -10,6 +10,16 @@ Features:
 * Automatic plotting at the end of the recording
 * Adjustable parameters (run with `-h` to check command line arguments)
 
+## Usage
+
+Run directly with `python2 templogger.py`, or generate stand-alone executive
+with `genexec.sh` (on Linux) or `genexec.bat` (on Windows) - the resulting
+file will be in the `dist` subdirectory.
+
+Get the command line options by running `--help`. Run the program without
+any arguments to start logging. Use `--onlyplot FILENAME` to plot results
+from an existing log.
+
 ## License
 
 The MIT License (MIT)
